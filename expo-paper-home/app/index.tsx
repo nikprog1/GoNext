@@ -1,17 +1,10 @@
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Appbar, Button, Snackbar, Text } from 'react-native-paper';
+import { Appbar, Button, Text } from 'react-native-paper';
+import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
-  const [snackbarVisible, setSnackbarVisible] = React.useState(false);
-
-  const handlePress = () => {
-    setSnackbarVisible(true);
-  };
-
-  const handleDismiss = () => {
-    setSnackbarVisible(false);
-  };
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -20,31 +13,54 @@ export default function HomeScreen() {
       </Appbar.Header>
 
       <View style={styles.content}>
-        <Text variant="titleMedium">Привет, Николай!</Text>
-        <Button mode="contained" style={styles.button} onPress={handlePress}>
-          Нажми меня
+        <Text variant="headlineSmall" style={styles.title}>
+          Дневник туриста
+        </Text>
+        <Button
+          mode="contained"
+          style={styles.button}
+          onPress={() => router.push('/places' as any)}
+          icon="map-marker"
+        >
+          Места
+        </Button>
+        <Button
+          mode="contained"
+          style={styles.button}
+          onPress={() => router.push('/trips' as any)}
+          icon="routes"
+        >
+          Поездки
+        </Button>
+        <Button
+          mode="contained"
+          style={styles.button}
+          onPress={() => router.push('/next-place' as any)}
+          icon="map-marker-check"
+        >
+          Следующее место
+        </Button>
+        <Button
+          mode="outlined"
+          style={styles.button}
+          onPress={() => router.push('/settings' as any)}
+          icon="cog"
+        >
+          Настройки
         </Button>
       </View>
-
-      <Snackbar visible={snackbarVisible} onDismiss={handleDismiss} duration={2000}>
-        Кнопка нажата
-      </Snackbar>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   content: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    gap: 12,
   },
-  button: {
-    marginTop: 16,
-  },
+  title: { marginBottom: 24, textAlign: 'center' },
+  button: { marginVertical: 4 },
 });
-

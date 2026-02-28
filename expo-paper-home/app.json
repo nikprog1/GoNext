@@ -27,6 +27,7 @@
     },
     "plugins": [
       "expo-router",
+      ["expo-image-picker", {"photosPermission": "Приложение использует доступ к фото для мест и поездок"}],
       [
         "expo-splash-screen",
         {
