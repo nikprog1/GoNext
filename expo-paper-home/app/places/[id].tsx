@@ -106,17 +106,32 @@ export default function PlaceDetailScreen() {
               </Text>
             ) : null}
           </Card.Content>
-          <Card.Actions>
-            <Button onPress={handleMap} icon="map">
+          <View style={styles.cardActions}>
+            <Button
+              onPress={handleMap}
+              icon="map"
+              mode="outlined"
+              style={styles.actionBtn}
+            >
               Карта
             </Button>
-            <Button onPress={handleNavigator} icon="navigation">
+            <Button
+              onPress={handleNavigator}
+              icon="navigation"
+              mode="outlined"
+              style={styles.actionBtn}
+            >
               Маршрут
             </Button>
-            <Button onPress={() => router.push(`/places/${id}/edit` as any)} icon="pencil">
+            <Button
+              onPress={() => router.push(`/places/${id}/edit` as any)}
+              icon="pencil"
+              mode="outlined"
+              style={styles.actionBtn}
+            >
               Редактировать
             </Button>
-          </Card.Actions>
+          </View>
         </Card>
         {place.photos && place.photos.length > 1 && (
           <View style={styles.photosRow}>
@@ -144,6 +159,14 @@ const styles = StyleSheet.create({
   chips: { flexDirection: 'row', gap: 8, marginBottom: 12 },
   desc: { marginBottom: 8 },
   coords: { color: '#666' },
+  cardActions: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  actionBtn: {
+    marginVertical: 4,
+    alignSelf: 'stretch',
+  },
   photosRow: { flexDirection: 'row', flexWrap: 'wrap', padding: 16, gap: 8 },
   thumb: { width: 80, height: 80, borderRadius: 8 },
 });
