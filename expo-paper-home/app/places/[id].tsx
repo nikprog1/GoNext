@@ -5,13 +5,14 @@ import {
   Appbar,
   Card,
   Text,
+  TextInput,
   Button,
   Chip,
   ActivityIndicator,
   Snackbar,
 } from 'react-native-paper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { getPlaceById } from '@/services';
+import { getPlaceById, updatePlace } from '@/services';
 import { openOnMap, openInNavigator } from '@/utils/map';
 import type { Place } from '@/types';
 
@@ -21,6 +22,7 @@ export default function PlaceDetailScreen() {
   const [place, setPlace] = useState<Place | null>(null);
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState('');
+  const [savingNotes, setSavingNotes] = useState(false);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -48,6 +50,18 @@ export default function PlaceDetailScreen() {
       await openOnMap(place.dd);
     } catch {
       setSnackbar('Не удалось открыть карту');
+    }
+  };
+
+  const handleTravelNotesBlur = async () => {
+    if (!place || !id) return;
+    setSavingNotes(true);
+    try {
+      await updatePlace(place);
+    } catch {
+      setSnackbar('Ошибка сохранения заметок');
+    } finally {
+      setSavingNotes(false);
     }
   };
 
@@ -105,6 +119,18 @@ export default function PlaceDetailScreen() {
                 Координаты: {place.dd}
               </Text>
             ) : null}
+            <TextInput
+              label="Путевые заметки"
+              value={place.travelNotes ?? ''}
+              onChangeText={(t) => setPlace((p) => (p ? { ...p, travelNotes: t } : p))}
+              onBlur={handleTravelNotesBlur}
+              mode="outlined"
+              multiline
+              numberOfLines={3}
+              placeholder="Заметки о месте..."
+              style={styles.travelNotes}
+              disabled={savingNotes}
+            />
           </Card.Content>
           <View style={styles.cardActions}>
             <Button
@@ -159,6 +185,7 @@ const styles = StyleSheet.create({
   chips: { flexDirection: 'row', gap: 8, marginBottom: 12 },
   desc: { marginBottom: 8 },
   coords: { color: '#666' },
+  travelNotes: { marginTop: 12 },
   cardActions: {
     paddingHorizontal: 16,
     paddingVertical: 8,

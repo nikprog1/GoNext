@@ -8,6 +8,7 @@ function parsePlace(row: Record<string, unknown>): Place {
     id: String(row.id),
     name: String(row.name),
     description: String(row.description),
+    travelNotes: String(row.travelNotes ?? ''),
     visitlater: Boolean(row.visitlater),
     liked: Boolean(row.liked),
     dd: String(row.dd),
@@ -39,13 +40,15 @@ export async function createPlace(place: Omit<Place, 'id' | 'createdAt'>): Promi
   const createdAt = new Date().toISOString();
   const photos = JSON.stringify(place.photos ?? []);
 
+  const travelNotes = place.travelNotes ?? '';
   await db.runAsync(
-    `INSERT INTO places (id, name, description, visitlater, liked, dd, photos, createdAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO places (id, name, description, travelNotes, visitlater, liked, dd, photos, createdAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id,
       place.name,
       place.description,
+      travelNotes,
       place.visitlater ? 1 : 0,
       place.liked ? 1 : 0,
       place.dd,
@@ -54,7 +57,7 @@ export async function createPlace(place: Omit<Place, 'id' | 'createdAt'>): Promi
     ]
   );
 
-  return { ...place, id, photos: place.photos ?? [], createdAt };
+  return { ...place, id, travelNotes, photos: place.photos ?? [], createdAt };
 }
 
 export async function updatePlace(place: Place): Promise<void> {
@@ -62,11 +65,12 @@ export async function updatePlace(place: Place): Promise<void> {
   const photos = JSON.stringify(place.photos);
 
   await db.runAsync(
-    `UPDATE places SET name = ?, description = ?, visitlater = ?, liked = ?, dd = ?, photos = ?
+    `UPDATE places SET name = ?, description = ?, travelNotes = ?, visitlater = ?, liked = ?, dd = ?, photos = ?
      WHERE id = ?`,
     [
       place.name,
       place.description,
+      place.travelNotes ?? '',
       place.visitlater ? 1 : 0,
       place.liked ? 1 : 0,
       place.dd,

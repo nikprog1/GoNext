@@ -18,6 +18,7 @@ import { logError } from '@/utils/logger';
 const EMPTY_PLACE = {
   name: '',
   description: '',
+  travelNotes: '',
   visitlater: true,
   liked: false,
   dd: '',
@@ -56,6 +57,7 @@ export default function NewPlaceScreen() {
     try {
       await createPlace({
         ...place,
+        travelNotes: place.travelNotes ?? '',
         dd: place.dd || '0,0',
       });
       router.back();
@@ -89,6 +91,16 @@ export default function NewPlaceScreen() {
           mode="outlined"
           multiline
           numberOfLines={3}
+          style={styles.input}
+        />
+        <TextInput
+          label="Путевые заметки"
+          value={place.travelNotes}
+          onChangeText={(t) => setPlace((p) => ({ ...p, travelNotes: t }))}
+          mode="outlined"
+          multiline
+          numberOfLines={3}
+          placeholder="Заметки о месте..."
           style={styles.input}
         />
         <TextInput

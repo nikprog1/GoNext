@@ -3,6 +3,8 @@ export interface Place {
   id: string;
   name: string;
   description: string;
+  /** Путевые заметки */
+  travelNotes: string;
   visitlater: boolean;
   liked: boolean;
   /** GPS в формате Decimal Degrees: "latitude,longitude" */

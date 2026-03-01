@@ -50,4 +50,15 @@ async function initSchema(database: SQLite.SQLiteDatabase): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_trip_places_trip ON trip_places(trip_id);
     CREATE INDEX IF NOT EXISTS idx_trip_places_place ON trip_places(place_id);
   `);
+  await migratePlacesAddTravelNotes(database);
+}
+
+async function migratePlacesAddTravelNotes(database: SQLite.SQLiteDatabase): Promise<void> {
+  try {
+    await database.execAsync(
+      `ALTER TABLE places ADD COLUMN travelNotes TEXT NOT NULL DEFAULT ''`
+    );
+  } catch {
+    // колонка уже существует
+  }
 }

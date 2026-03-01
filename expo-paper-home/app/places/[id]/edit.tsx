@@ -121,6 +121,16 @@ export default function EditPlaceScreen() {
           style={styles.input}
         />
         <TextInput
+          label="Путевые заметки"
+          value={place.travelNotes ?? ''}
+          onChangeText={(t) => setPlace((p) => (p ? { ...p, travelNotes: t } : p))}
+          mode="outlined"
+          multiline
+          numberOfLines={3}
+          placeholder="Заметки о месте..."
+          style={styles.input}
+        />
+        <TextInput
           label="Координаты (широта, долгота)"
           value={place.dd}
           onChangeText={(t) => setPlace((p) => (p ? { ...p, dd: t } : p))}
