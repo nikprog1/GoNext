@@ -11,6 +11,7 @@ import {
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { createTrip } from '@/services';
+import { logError } from '@/utils/logger';
 
 const today = new Date().toISOString().slice(0, 10);
 const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
@@ -43,6 +44,7 @@ export default function NewTripScreen() {
       });
       router.replace(`/trips/${trip.id}` as any);
     } catch (e) {
+      logError('trips/new: создание поездки', e);
       setSnackbar('Ошибка сохранения');
     } finally {
       setSaving(false);

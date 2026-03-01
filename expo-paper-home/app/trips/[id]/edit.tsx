@@ -12,6 +12,7 @@ import {
 } from 'react-native-paper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getTripById, updateTrip } from '@/services';
+import { logError } from '@/utils/logger';
 import type { Trip } from '@/types';
 
 export default function EditTripScreen() {
@@ -29,6 +30,7 @@ export default function EditTripScreen() {
       const t = await getTripById(id);
       setTrip(t);
     } catch (e) {
+      logError('trips/edit: загрузка поездки', e);
       setSnackbar('Ошибка загрузки');
     } finally {
       setLoading(false);
@@ -50,6 +52,7 @@ export default function EditTripScreen() {
       await updateTrip(trip);
       router.back();
     } catch (e) {
+      logError('trips/edit: сохранение поездки', e);
       setSnackbar('Ошибка сохранения');
     } finally {
       setSaving(false);

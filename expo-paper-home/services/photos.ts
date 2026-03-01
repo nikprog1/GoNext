@@ -5,6 +5,7 @@ import {
   getInfoAsync,
   deleteAsync,
 } from 'expo-file-system/legacy';
+import { generateUUID } from '../utils/uuid';
 
 const PHOTOS_SUBDIR = 'gonext/photos/';
 
@@ -26,7 +27,7 @@ async function ensurePhotosDir(): Promise<string> {
 /** Сохраняет фото по URI и возвращает локальный путь для хранения в БД */
 export async function savePhoto(uri: string): Promise<string> {
   const dir = await ensurePhotosDir();
-  const filename = `${crypto.randomUUID()}.jpg`;
+  const filename = `${generateUUID()}.jpg`;
   const destPath = `${dir}${filename}`;
   await copyAsync({ from: uri, to: destPath });
   return destPath;

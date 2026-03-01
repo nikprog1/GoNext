@@ -1,4 +1,5 @@
 import { getDb } from './db';
+import { generateUUID } from '../utils/uuid';
 import type { Place } from '../types';
 
 function parsePlace(row: Record<string, unknown>): Place {
@@ -34,7 +35,7 @@ export async function getPlaceById(id: string): Promise<Place | null> {
 
 export async function createPlace(place: Omit<Place, 'id' | 'createdAt'>): Promise<Place> {
   const db = await getDb();
-  const id = crypto.randomUUID();
+  const id = generateUUID();
   const createdAt = new Date().toISOString();
   const photos = JSON.stringify(place.photos ?? []);
 

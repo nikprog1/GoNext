@@ -341,20 +341,31 @@ function PlaceInTripRow({
             </View>
           </View>
         </Card.Content>
-        <Card.Actions>
-          <Button onPress={onMap} icon="map" compact>
+        <View style={styles.cardActions}>
+          <Button onPress={onMap} icon="map" compact style={styles.actionBtn}>
             Карта
           </Button>
-          <Button onPress={onNav} icon="navigation" compact>
+          <Button onPress={onNav} icon="navigation" compact style={styles.actionBtn}>
             Маршрут
           </Button>
-          <Button onPress={() => setNotesVisible(true)} icon="pencil" compact>
+          <Button
+            onPress={() => setNotesVisible(true)}
+            icon="pencil"
+            compact
+            style={styles.actionBtn}
+          >
             Заметки
           </Button>
-          <Button onPress={onRemove} icon="delete" compact textColor="#c62828">
+          <Button
+            onPress={onRemove}
+            icon="delete"
+            compact
+            textColor="#c62828"
+            style={styles.actionBtn}
+          >
             Удалить
           </Button>
-        </Card.Actions>
+        </View>
       </Card>
 
       <Portal>
@@ -400,6 +411,18 @@ const styles = StyleSheet.create({
   empty: { color: '#666', marginTop: 8 },
   emptyPlaces: { padding: 24, color: '#666' },
   placeCard: { marginBottom: 12 },
+  cardActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    gap: 4,
+  },
+  actionBtn: {
+    marginHorizontal: 2,
+    marginVertical: 2,
+    minWidth: 0,
+  },
   placeRow: { flexDirection: 'row', alignItems: 'flex-start' },
   placeInfo: { flex: 1, marginLeft: 8 },
   notes: { marginTop: 4, color: '#666' },

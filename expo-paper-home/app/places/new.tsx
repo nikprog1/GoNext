@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { createPlace } from '@/services';
 import { savePhoto } from '@/services/photos';
+import { logError } from '@/utils/logger';
 
 const EMPTY_PLACE = {
   name: '',
@@ -40,6 +41,7 @@ export default function NewPlaceScreen() {
         const path = await savePhoto(result.assets[0].uri);
         setPlace((p) => ({ ...p, photos: [...p.photos, path] }));
       } catch (e) {
+        logError('places/new: добавление фото', e);
         setSnackbar('Ошибка при добавлении фото');
       }
     }
@@ -58,6 +60,7 @@ export default function NewPlaceScreen() {
       });
       router.back();
     } catch (e) {
+      logError('places/new: сохранение места', e);
       setSnackbar('Ошибка сохранения');
     } finally {
       setSaving(false);

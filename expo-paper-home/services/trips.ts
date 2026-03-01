@@ -1,4 +1,5 @@
 import { getDb } from './db';
+import { generateUUID } from '../utils/uuid';
 import { getPlaceById } from './places';
 import type { Trip, TripPlace } from '../types';
 import type { Place } from '../types';
@@ -76,7 +77,7 @@ export async function createTrip(
   trip: Omit<Trip, 'id' | 'createdAt' | 'places'>
 ): Promise<Trip> {
   const db = await getDb();
-  const id = crypto.randomUUID();
+  const id = generateUUID();
   const createdAt = new Date().toISOString();
 
   await db.runAsync(

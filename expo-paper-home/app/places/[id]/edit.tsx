@@ -13,6 +13,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { getPlaceById, updatePlace } from '@/services';
+import { logError } from '@/utils/logger';
 import { savePhoto } from '@/services/photos';
 import type { Place } from '@/types';
 
@@ -53,6 +54,7 @@ export default function EditPlaceScreen() {
         const path = await savePhoto(result.assets[0].uri);
         setPlace((p) => (p ? { ...p, photos: [...p.photos, path] } : p));
       } catch (e) {
+        logError('places/edit: добавление фото', e);
         setSnackbar('Ошибка при добавлении фото');
       }
     }
@@ -73,6 +75,7 @@ export default function EditPlaceScreen() {
       await updatePlace(place);
       router.back();
     } catch (e) {
+      logError('places/edit: сохранение места', e);
       setSnackbar('Ошибка сохранения');
     } finally {
       setSaving(false);
