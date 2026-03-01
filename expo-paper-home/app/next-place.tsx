@@ -84,20 +84,27 @@ export default function NextPlaceScreen() {
                 </Text>
               ) : null}
             </Card.Content>
-            <Card.Actions>
-              <Button onPress={handleMap} icon="map">
+            <View style={styles.cardActions}>
+              <Button onPress={handleMap} icon="map" compact style={styles.actionBtn}>
                 Карта
               </Button>
-              <Button onPress={handleNavigator} icon="navigation">
+              <Button
+                onPress={handleNavigator}
+                icon="navigation"
+                compact
+                style={styles.actionBtn}
+              >
                 Маршрут
               </Button>
               <Button
                 onPress={() => router.push(`/places/${data.place.id}` as any)}
                 icon="information"
+                compact
+                style={styles.actionBtn}
               >
                 Подробнее
               </Button>
-            </Card.Actions>
+            </View>
           </Card>
         </ScrollView>
       )}
@@ -122,4 +129,16 @@ const styles = StyleSheet.create({
   hint: { marginTop: 8, color: '#666', textAlign: 'center' },
   tripTitle: { marginTop: 4, color: '#666' },
   desc: { marginTop: 8 },
+  cardActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    gap: 4,
+  },
+  actionBtn: {
+    marginHorizontal: 2,
+    marginVertical: 2,
+    minWidth: 0,
+  },
 });
