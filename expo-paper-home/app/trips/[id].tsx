@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, View, ScrollView, RefreshControl } from 'react-native';
+import { StyleSheet, View, ScrollView, RefreshControl, Image } from 'react-native';
 import {
   Appbar,
   Card,
@@ -24,9 +24,12 @@ import {
   removePlaceFromTrip,
   addPlaceToTrip,
   getAllPlaces,
+  reorderTripPlaces,
 } from '@/services';
 import { openOnMap, openInNavigator } from '@/utils/map';
 import type { Trip, TripPlace, Place } from '@/types';
+import * as ImagePicker from 'expo-image-picker';
+import { savePhoto } from '@/services/photos';
 
 type ViewMode = 'plan' | 'diary';
 
@@ -135,6 +138,25 @@ export default function TripDetailScreen() {
     }
   };
 
+  const handleMovePlace = async (placeId: string, direction: 'up' | 'down') => {
+    if (!id || !trip) return;
+    const index = trip.places.findIndex((tp) => tp.placeId === placeId);
+    if (index === -1) return;
+    const swapWith = direction === 'up' ? index - 1 : index + 1;
+    if (swapWith < 0 || swapWith >= trip.places.length) return;
+
+    const reordered = [...trip.places];
+    [reordered[index], reordered[swapWith]] = [reordered[swapWith], reordered[index]];
+    const ids = reordered.map((tp) => tp.placeId);
+
+    try {
+      await reorderTripPlaces(id, ids);
+      await load();
+    } catch (e) {
+      setSnackbar('Ошибка изменения порядка');
+    }
+  };
+
   const formatDate = (d: string | null) =>
     d ? new Date(d).toLocaleDateString('ru-RU') : '';
 
@@ -227,6 +249,8 @@ export default function TripDetailScreen() {
                 onMap={() => place.dd && openOnMap(place.dd)}
                 onNav={() => place.dd && openInNavigator(place.dd)}
                 onRemove={() => handleRemovePlace(tp.placeId)}
+                  onMoveUp={() => handleMovePlace(tp.placeId, 'up')}
+                  onMoveDown={() => handleMovePlace(tp.placeId, 'down')}
                 onNotesSaved={load}
               />
             );
@@ -281,6 +305,8 @@ function PlaceInTripRow({
   onMap,
   onNav,
   onRemove,
+  onMoveUp,
+  onMoveDown,
   onNotesSaved,
 }: {
   tripId: string;
@@ -291,15 +317,24 @@ function PlaceInTripRow({
   onMap: () => void;
   onNav: () => void;
   onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
   onNotesSaved: () => void;
 }) {
   const [notesVisible, setNotesVisible] = useState(false);
   const [notes, setNotes] = useState(tripPlace.notes);
   const [savingNotes, setSavingNotes] = useState(false);
+  const [photosVisible, setPhotosVisible] = useState(false);
+  const [photos, setPhotos] = useState<string[]>(tripPlace.photos ?? []);
+  const [savingPhoto, setSavingPhoto] = useState(false);
 
   React.useEffect(() => {
     setNotes(tripPlace.notes);
   }, [tripPlace.notes]);
+
+  React.useEffect(() => {
+    setPhotos(tripPlace.photos ?? []);
+  }, [tripPlace.photos]);
 
   const formatDate = (d: string | null) =>
     d ? new Date(d).toLocaleDateString('ru-RU') : '';
@@ -314,6 +349,27 @@ function PlaceInTripRow({
       // ignore
     } finally {
       setSavingNotes(false);
+    }
+  };
+
+  const handleAddPhoto = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 0.8,
+    });
+    if (result.canceled || !result.assets?.[0]?.uri) return;
+    setSavingPhoto(true);
+    try {
+      const path = await savePhoto(result.assets[0].uri);
+      const nextPhotos = [...photos, path];
+      setPhotos(nextPhotos);
+      await updateTripPlace(tripId, tripPlace.placeId, { photos: nextPhotos });
+      onNotesSaved();
+    } catch {
+      // ignore
+    } finally {
+      setSavingPhoto(false);
     }
   };
 
@@ -342,6 +398,12 @@ function PlaceInTripRow({
           </View>
         </Card.Content>
         <View style={styles.cardActions}>
+          <Button onPress={onMoveUp} icon="chevron-up" compact style={styles.actionBtn}>
+            Вверх
+          </Button>
+          <Button onPress={onMoveDown} icon="chevron-down" compact style={styles.actionBtn}>
+            Вниз
+          </Button>
           <Button onPress={onMap} icon="map" compact style={styles.actionBtn}>
             Карта
           </Button>
@@ -355,6 +417,14 @@ function PlaceInTripRow({
             style={styles.actionBtn}
           >
             Заметки
+          </Button>
+          <Button
+            onPress={() => setPhotosVisible(true)}
+            icon="image"
+            compact
+            style={styles.actionBtn}
+          >
+            Фото
           </Button>
           <Button
             onPress={onRemove}
@@ -386,6 +456,30 @@ function PlaceInTripRow({
             <Button onPress={handleSaveNotes} loading={savingNotes} disabled={savingNotes}>
               Сохранить
             </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+      <Portal>
+        <Dialog visible={photosVisible} onDismiss={() => setPhotosVisible(false)}>
+          <Dialog.Title>Фото: {place.name}</Dialog.Title>
+          <Dialog.ScrollArea style={styles.dialogScroll}>
+            <ScrollView horizontal contentContainerStyle={styles.photosRow}>
+              {photos.length === 0 ? (
+                <Text variant="bodyMedium" style={styles.empty}>
+                  Нет фотографий
+                </Text>
+              ) : (
+                photos.map((uri, index) => (
+                  <Image key={index} source={{ uri }} style={styles.photoThumb} />
+                ))
+              )}
+            </ScrollView>
+          </Dialog.ScrollArea>
+          <Dialog.Actions>
+            <Button onPress={handleAddPhoto} loading={savingPhoto} disabled={savingPhoto}>
+              Добавить фото
+            </Button>
+            <Button onPress={() => setPhotosVisible(false)}>Закрыть</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
