@@ -4,6 +4,7 @@
  */
 
 import { Platform } from 'react-native';
+import type { ThemePrimaryColor } from '@/types/theme';
 
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
@@ -26,6 +27,19 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
 };
+
+export const PrimaryColors: { key: ThemePrimaryColor; value: string }[] = [
+  { key: 'violet', value: '#7C4DFF' },
+  { key: 'indigo', value: '#3D5AFE' },
+  { key: 'blue', value: '#2979FF' },
+  { key: 'teal', value: '#00897B' },
+  { key: 'green', value: '#43A047' },
+  { key: 'lime', value: '#C0CA33' },
+  { key: 'amber', value: '#FFB300' },
+  { key: 'orange', value: '#FB8C00' },
+  { key: 'red', value: '#E53935' },
+  { key: 'pink', value: '#D81B60' },
+];
 
 export const Fonts = Platform.select({
   ios: {
