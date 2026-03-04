@@ -1,0 +1,49 @@
+{
+  "app": {
+    "name": "GoNext"
+  },
+  "home": {
+    "title": "Travel diary",
+    "places": "Places",
+    "trips": "Trips",
+    "nextPlace": "Next place",
+    "settings": "Settings"
+  },
+  "places": {
+    "listTitle": "Places",
+    "emptyTitle": "No places",
+    "emptyHint": "Add your first place",
+    "addButton": "Add",
+    "newTitle": "New place",
+    "editTitle": "Edit place"
+  },
+  "trips": {
+    "listTitle": "Trips"
+  },
+  "settings": {
+    "title": "Settings",
+    "version": "Version {{version}}",
+    "themeSection": "Theme",
+    "primaryColorSection": "Primary color",
+    "languageSection": "Language",
+    "logsButton": "Error logs",
+    "logsEmpty": "No entries",
+    "logsTitle": "Error logs",
+    "logsRefresh": "Refresh",
+    "logsClear": "Clear",
+    "logsClose": "Close"
+  },
+  "common": {
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "errorLoading": "Load error",
+    "errorSaving": "Save error"
+  },
+  "language": {
+    "ru": "Russian",
+    "en": "English"
+  }
+}
+

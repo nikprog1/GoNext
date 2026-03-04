@@ -1,0 +1,49 @@
+{
+  "app": {
+    "name": "GoNext"
+  },
+  "home": {
+    "title": "Дневник туриста",
+    "places": "Места",
+    "trips": "Поездки",
+    "nextPlace": "Следующее место",
+    "settings": "Настройки"
+  },
+  "places": {
+    "listTitle": "Места",
+    "emptyTitle": "Нет мест",
+    "emptyHint": "Добавьте первое место",
+    "addButton": "Добавить",
+    "newTitle": "Новое место",
+    "editTitle": "Редактировать место"
+  },
+  "trips": {
+    "listTitle": "Поездки"
+  },
+  "settings": {
+    "title": "Настройки",
+    "version": "Версия {{version}}",
+    "themeSection": "Тема",
+    "primaryColorSection": "Основной цвет",
+    "languageSection": "Язык",
+    "logsButton": "Логи ошибок",
+    "logsEmpty": "Нет записей",
+    "logsTitle": "Логи ошибок",
+    "logsRefresh": "Обновить",
+    "logsClear": "Очистить",
+    "logsClose": "Закрыть"
+  },
+  "common": {
+    "back": "Назад",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "close": "Закрыть",
+    "errorLoading": "Ошибка загрузки",
+    "errorSaving": "Ошибка сохранения"
+  },
+  "language": {
+    "ru": "Русский",
+    "en": "English"
+  }
+}
+
