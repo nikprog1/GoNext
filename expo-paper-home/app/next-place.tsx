@@ -5,12 +5,14 @@ import { Appbar, Button, Card, Text, Snackbar, ActivityIndicator } from 'react-n
 import { useRouter } from 'expo-router';
 import { getNextPlace } from '@/services';
 import { openOnMap, openInNavigator } from '@/utils/map';
+import { useTranslation } from 'react-i18next';
 
 export default function NextPlaceScreen() {
   const router = useRouter();
   const [data, setData] = useState<Awaited<ReturnType<typeof getNextPlace>>>(null);
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState('');
+  const { t } = useTranslation();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -18,7 +20,7 @@ export default function NextPlaceScreen() {
       const result = await getNextPlace();
       setData(result);
     } catch (e) {
-      setSnackbar('Ошибка загрузки');
+      setSnackbar(t('common.errorLoading'));
     } finally {
       setLoading(false);
     }
@@ -30,25 +32,25 @@ export default function NextPlaceScreen() {
 
   const handleMap = async () => {
     if (!data?.place.dd) {
-      setSnackbar('Координаты не указаны');
+      setSnackbar(t('places.errorCoordsMissing'));
       return;
     }
     try {
       await openOnMap(data.place.dd);
     } catch {
-      setSnackbar('Не удалось открыть карту');
+      setSnackbar(t('places.errorMapOpen'));
     }
   };
 
   const handleNavigator = async () => {
     if (!data?.place.dd) {
-      setSnackbar('Координаты не указаны');
+      setSnackbar(t('places.errorCoordsMissing'));
       return;
     }
     try {
       await openInNavigator(data.place.dd);
     } catch {
-      setSnackbar('Не удалось открыть навигатор');
+      setSnackbar(t('places.errorNavigatorOpen'));
     }
   };
 
@@ -56,7 +58,7 @@ export default function NextPlaceScreen() {
     <View style={styles.container}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title="Следующее место" />
+        <Appbar.Content title={t('nextPlace.title')} />
       </Appbar.Header>
 
       {loading ? (
@@ -65,9 +67,9 @@ export default function NextPlaceScreen() {
         </View>
       ) : !data ? (
         <View style={styles.center}>
-          <Text variant="bodyLarge">Нет следующего места</Text>
+          <Text variant="bodyLarge">{t('nextPlace.emptyTitle')}</Text>
           <Text variant="bodyMedium" style={styles.hint}>
-            Выберите текущую поездку и добавьте в неё места
+            {t('nextPlace.emptyHint')}
           </Text>
         </View>
       ) : (
@@ -76,7 +78,7 @@ export default function NextPlaceScreen() {
             <Card.Content>
               <Text variant="headlineSmall">{data.place.name}</Text>
               <Text variant="bodyMedium" style={styles.tripTitle}>
-                Поездка: {data.trip.title}
+                {t('nextPlace.tripLabel', { title: data.trip.title })}
               </Text>
               {data.place.description ? (
                 <Text variant="bodyMedium" style={styles.desc}>
@@ -91,7 +93,7 @@ export default function NextPlaceScreen() {
                 mode="outlined"
                 style={styles.actionBtn}
               >
-                Карта
+                {t('nextPlace.map')}
               </Button>
               <Button
                 onPress={handleNavigator}
@@ -99,7 +101,7 @@ export default function NextPlaceScreen() {
                 mode="outlined"
                 style={styles.actionBtn}
               >
-                Маршрут
+                {t('nextPlace.route')}
               </Button>
               <Button
                 onPress={() => router.push(`/places/${data.place.id}` as any)}
@@ -107,7 +109,7 @@ export default function NextPlaceScreen() {
                 mode="outlined"
                 style={styles.actionBtn}
               >
-                Подробнее
+                {t('nextPlace.details')}
               </Button>
             </View>
           </Card>

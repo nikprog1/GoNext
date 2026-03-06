@@ -13,9 +13,11 @@ import {
 import { useRouter } from 'expo-router';
 import { getAllTrips } from '@/services';
 import type { Trip } from '@/types';
+import { useTranslation } from 'react-i18next';
 
 export default function TripsListScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -26,7 +28,7 @@ export default function TripsListScreen() {
       const data = await getAllTrips();
       setTrips(data);
     } catch (e) {
-      setSnackbar('Ошибка загрузки');
+      setSnackbar(t('common.errorLoading'));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -43,6 +45,7 @@ export default function TripsListScreen() {
   };
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString('ru-RU');
+  // TODO: при необходимости можно локализовать формат даты отдельно
 
   const renderItem = ({ item }: { item: Trip }) => (
     <List.Item
@@ -52,7 +55,7 @@ export default function TripsListScreen() {
       right={() =>
         item.current ? (
           <Chip compact style={styles.chip}>
-            Текущая
+            {t('trips.chipCurrent')}
           </Chip>
         ) : null
       }
@@ -64,7 +67,7 @@ export default function TripsListScreen() {
     <View style={styles.container}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title="Поездки" />
+        <Appbar.Content title={t('trips.listTitle')} />
       </Appbar.Header>
 
       {loading ? (
@@ -73,9 +76,9 @@ export default function TripsListScreen() {
         </View>
       ) : trips.length === 0 ? (
         <View style={styles.center}>
-          <Text variant="bodyLarge">Нет поездок</Text>
+          <Text variant="bodyLarge">{t('trips.emptyTitle')}</Text>
           <Text variant="bodyMedium" style={styles.hint}>
-            Создайте первую поездку
+            {t('trips.emptyHint')}
           </Text>
         </View>
       ) : (
@@ -93,7 +96,7 @@ export default function TripsListScreen() {
         icon="plus"
         style={styles.fab}
         onPress={() => router.push('/trips/new' as any)}
-        label="Создать"
+        label={t('trips.fabCreate')}
       />
 
       <Snackbar visible={!!snackbar} onDismiss={() => setSnackbar('')} duration={2000}>

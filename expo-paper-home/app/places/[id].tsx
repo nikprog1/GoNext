@@ -15,10 +15,12 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getPlaceById, updatePlace } from '@/services';
 import { openOnMap, openInNavigator } from '@/utils/map';
 import type { Place } from '@/types';
+import { useTranslation } from 'react-i18next';
 
 export default function PlaceDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { t } = useTranslation();
   const [place, setPlace] = useState<Place | null>(null);
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState('');
@@ -31,7 +33,7 @@ export default function PlaceDetailScreen() {
       const p = await getPlaceById(id);
       setPlace(p);
     } catch (e) {
-      setSnackbar('Ошибка загрузки');
+      setSnackbar(t('common.errorLoading'));
     } finally {
       setLoading(false);
     }
@@ -43,13 +45,13 @@ export default function PlaceDetailScreen() {
 
   const handleMap = async () => {
     if (!place?.dd) {
-      setSnackbar('Координаты не указаны');
+      setSnackbar(t('places.errorCoordsMissing'));
       return;
     }
     try {
       await openOnMap(place.dd);
     } catch {
-      setSnackbar('Не удалось открыть карту');
+      setSnackbar(t('places.errorMapOpen'));
     }
   };
 
@@ -59,7 +61,7 @@ export default function PlaceDetailScreen() {
     try {
       await updatePlace(place);
     } catch {
-      setSnackbar('Ошибка сохранения заметок');
+      setSnackbar(t('places.errorNotesSave'));
     } finally {
       setSavingNotes(false);
     }
@@ -67,13 +69,13 @@ export default function PlaceDetailScreen() {
 
   const handleNavigator = async () => {
     if (!place?.dd) {
-      setSnackbar('Координаты не указаны');
+      setSnackbar(t('places.errorCoordsMissing'));
       return;
     }
     try {
       await openInNavigator(place.dd);
     } catch {
-      setSnackbar('Не удалось открыть навигатор');
+      setSnackbar(t('places.errorNavigatorOpen'));
     }
   };
 
@@ -82,10 +84,14 @@ export default function PlaceDetailScreen() {
       <View style={styles.container}>
         <Appbar.Header>
           <Appbar.BackAction onPress={() => router.back()} />
-          <Appbar.Content title="Место" />
+          <Appbar.Content title={t('places.detailTitle')} />
         </Appbar.Header>
         <View style={styles.center}>
-          {loading ? <ActivityIndicator size="large" /> : <Text>Не найдено</Text>}
+          {loading ? (
+            <ActivityIndicator size="large" />
+          ) : (
+            <Text>{t('places.detailNotFound')}</Text>
+          )}
         </View>
       </View>
     );
@@ -106,8 +112,8 @@ export default function PlaceDetailScreen() {
         <Card style={styles.card}>
           <Card.Content>
             <View style={styles.chips}>
-              {place.visitlater && <Chip icon="clock-outline">Посетить</Chip>}
-              {place.liked && <Chip icon="heart">Понравилось</Chip>}
+              {place.visitlater && <Chip icon="clock-outline">{t('places.detailVisit')}</Chip>}
+              {place.liked && <Chip icon="heart">{t('places.detailLiked')}</Chip>}
             </View>
             {place.description ? (
               <Text variant="bodyLarge" style={styles.desc}>
@@ -116,18 +122,18 @@ export default function PlaceDetailScreen() {
             ) : null}
             {place.dd ? (
               <Text variant="bodySmall" style={styles.coords}>
-                Координаты: {place.dd}
+                {t('places.detailCoords', { coords: place.dd })}
               </Text>
             ) : null}
             <TextInput
-              label="Путевые заметки"
+              label={t('places.detailTravelNotesLabel')}
               value={place.travelNotes ?? ''}
               onChangeText={(t) => setPlace((p) => (p ? { ...p, travelNotes: t } : p))}
               onBlur={handleTravelNotesBlur}
               mode="outlined"
               multiline
               numberOfLines={3}
-              placeholder="Заметки о месте..."
+              placeholder={t('places.detailTravelNotesPlaceholder')}
               style={styles.travelNotes}
               disabled={savingNotes}
             />
@@ -139,7 +145,7 @@ export default function PlaceDetailScreen() {
               mode="outlined"
               style={styles.actionBtn}
             >
-              Карта
+              {t('places.detailMap')}
             </Button>
             <Button
               onPress={handleNavigator}
@@ -147,7 +153,7 @@ export default function PlaceDetailScreen() {
               mode="outlined"
               style={styles.actionBtn}
             >
-              Маршрут
+              {t('places.detailRoute')}
             </Button>
             <Button
               onPress={() => router.push(`/places/${id}/edit` as any)}
@@ -155,7 +161,7 @@ export default function PlaceDetailScreen() {
               mode="outlined"
               style={styles.actionBtn}
             >
-              Редактировать
+              {t('places.detailEdit')}
             </Button>
           </View>
         </Card>

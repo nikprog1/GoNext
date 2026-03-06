@@ -5,9 +5,11 @@ import { Appbar, List, FAB, Text, ActivityIndicator, Snackbar } from 'react-nati
 import { useRouter } from 'expo-router';
 import { getAllPlaces } from '@/services';
 import type { Place } from '@/types';
+import { useTranslation } from 'react-i18next';
 
 export default function PlacesListScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -18,7 +20,7 @@ export default function PlacesListScreen() {
       const data = await getAllPlaces();
       setPlaces(data);
     } catch (e) {
-      setSnackbar('Ошибка загрузки');
+      setSnackbar(t('common.errorLoading'));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -54,7 +56,7 @@ export default function PlacesListScreen() {
     <View style={styles.container}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title="Места" />
+        <Appbar.Content title={t('places.listTitle')} />
       </Appbar.Header>
 
       {loading ? (
@@ -63,9 +65,9 @@ export default function PlacesListScreen() {
         </View>
       ) : places.length === 0 ? (
         <View style={styles.center}>
-          <Text variant="bodyLarge">Нет мест</Text>
+          <Text variant="bodyLarge">{t('places.emptyTitle')}</Text>
           <Text variant="bodyMedium" style={styles.hint}>
-            Добавьте первое место
+            {t('places.emptyHint')}
           </Text>
         </View>
       ) : (
@@ -83,7 +85,7 @@ export default function PlacesListScreen() {
         icon="plus"
         style={styles.fab}
         onPress={() => router.push('/places/new' as any)}
-        label="Добавить"
+        label={t('places.addButton')}
       />
 
       <Snackbar visible={!!snackbar} onDismiss={() => setSnackbar('')} duration={2000}>

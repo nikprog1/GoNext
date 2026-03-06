@@ -2,19 +2,21 @@ import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Appbar, Button, Text } from 'react-native-paper';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   return (
     <View style={styles.container}>
       <Appbar.Header>
-        <Appbar.Content title="GoNext" />
+        <Appbar.Content title={t('app.name')} />
       </Appbar.Header>
 
       <View style={styles.content}>
         <Text variant="headlineSmall" style={styles.title}>
-          Дневник туриста
+          {t('home.title')}
         </Text>
         <Button
           mode="contained"
@@ -22,7 +24,7 @@ export default function HomeScreen() {
           onPress={() => router.push('/places' as any)}
           icon="map-marker"
         >
-          Места
+          {t('home.places')}
         </Button>
         <Button
           mode="contained"
@@ -30,7 +32,7 @@ export default function HomeScreen() {
           onPress={() => router.push('/trips' as any)}
           icon="routes"
         >
-          Поездки
+          {t('home.trips')}
         </Button>
         <Button
           mode="contained"
@@ -38,7 +40,7 @@ export default function HomeScreen() {
           onPress={() => router.push('/next-place' as any)}
           icon="map-marker-check"
         >
-          Следующее место
+          {t('home.nextPlace')}
         </Button>
         <Button
           mode="outlined"
@@ -46,7 +48,7 @@ export default function HomeScreen() {
           onPress={() => router.push('/settings' as any)}
           icon="cog"
         >
-          Настройки
+          {t('home.settings')}
         </Button>
       </View>
     </View>

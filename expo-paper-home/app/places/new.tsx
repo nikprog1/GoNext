@@ -14,6 +14,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { createPlace } from '@/services';
 import { savePhoto } from '@/services/photos';
 import { logError } from '@/utils/logger';
+import { useTranslation } from 'react-i18next';
 
 const EMPTY_PLACE = {
   name: '',
@@ -27,6 +28,7 @@ const EMPTY_PLACE = {
 
 export default function NewPlaceScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [place, setPlace] = useState(EMPTY_PLACE);
   const [saving, setSaving] = useState(false);
   const [snackbar, setSnackbar] = useState('');
@@ -43,14 +45,14 @@ export default function NewPlaceScreen() {
         setPlace((p) => ({ ...p, photos: [...p.photos, path] }));
       } catch (e) {
         logError('places/new: добавление фото', e);
-        setSnackbar('Ошибка при добавлении фото');
+        setSnackbar(t('places.errorAddPhoto'));
       }
     }
   };
 
   const handleSave = async () => {
     if (!place.name.trim()) {
-      setSnackbar('Укажите название');
+      setSnackbar(t('places.errorNameRequired'));
       return;
     }
     setSaving(true);
@@ -73,19 +75,19 @@ export default function NewPlaceScreen() {
     <View style={styles.container}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title="Новое место" />
+        <Appbar.Content title={t('places.newTitle')} />
       </Appbar.Header>
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         <TextInput
-          label="Название *"
+          label={t('places.formNameLabel')}
           value={place.name}
           onChangeText={(t) => setPlace((p) => ({ ...p, name: t }))}
           mode="outlined"
           style={styles.input}
         />
         <TextInput
-          label="Описание"
+          label={t('places.formDescriptionLabel')}
           value={place.description}
           onChangeText={(t) => setPlace((p) => ({ ...p, description: t }))}
           mode="outlined"
@@ -94,42 +96,42 @@ export default function NewPlaceScreen() {
           style={styles.input}
         />
         <TextInput
-          label="Путевые заметки"
+          label={t('places.formTravelNotesLabel')}
           value={place.travelNotes}
           onChangeText={(t) => setPlace((p) => ({ ...p, travelNotes: t }))}
           mode="outlined"
           multiline
           numberOfLines={3}
-          placeholder="Заметки о месте..."
+          placeholder={t('places.formTravelNotesPlaceholder')}
           style={styles.input}
         />
         <TextInput
-          label="Координаты (широта, долгота)"
+          label={t('places.formCoordsLabel')}
           value={place.dd}
           onChangeText={(t) => setPlace((p) => ({ ...p, dd: t }))}
           mode="outlined"
-          placeholder="55.75, 37.62"
+          placeholder={t('places.formCoordsPlaceholder')}
           style={styles.input}
         />
         <View style={styles.row}>
-          <Text variant="bodyLarge">Посетить позже</Text>
+          <Text variant="bodyLarge">{t('places.formVisitLater')}</Text>
           <Switch
             value={place.visitlater}
             onValueChange={(v) => setPlace((p) => ({ ...p, visitlater: v }))}
           />
         </View>
         <View style={styles.row}>
-          <Text variant="bodyLarge">Понравилось</Text>
+          <Text variant="bodyLarge">{t('places.formLiked')}</Text>
           <Switch
             value={place.liked}
             onValueChange={(v) => setPlace((p) => ({ ...p, liked: v }))}
           />
         </View>
         <Text variant="titleSmall" style={styles.section}>
-          Фотографии
+          {t('places.formPhotosSection')}
         </Text>
         <TouchableOpacity style={styles.addPhoto} onPress={pickImage}>
-          <Text>+ Добавить фото</Text>
+          <Text>{t('places.formAddPhotoWithPlus')}</Text>
         </TouchableOpacity>
         {place.photos.length > 0 && (
           <View style={styles.photosRow}>
@@ -145,7 +147,7 @@ export default function NewPlaceScreen() {
           disabled={saving}
           style={styles.save}
         >
-          Сохранить
+          {t('common.save')}
         </Button>
       </ScrollView>
 

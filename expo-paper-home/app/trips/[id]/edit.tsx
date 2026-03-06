@@ -14,10 +14,12 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getTripById, updateTrip } from '@/services';
 import { logError } from '@/utils/logger';
 import type { Trip } from '@/types';
+import { useTranslation } from 'react-i18next';
 
 export default function EditTripScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { t } = useTranslation();
   const [trip, setTrip] = useState<Trip | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -31,7 +33,7 @@ export default function EditTripScreen() {
       setTrip(t);
     } catch (e) {
       logError('trips/edit: загрузка поездки', e);
-      setSnackbar('Ошибка загрузки');
+      setSnackbar(t('common.errorLoading'));
     } finally {
       setLoading(false);
     }
@@ -44,7 +46,7 @@ export default function EditTripScreen() {
   const handleSave = async () => {
     if (!trip || !id) return;
     if (!trip.title.trim()) {
-      setSnackbar('Укажите название');
+      setSnackbar(t('trips.errorNameRequired'));
       return;
     }
     setSaving(true);
@@ -53,7 +55,7 @@ export default function EditTripScreen() {
       router.back();
     } catch (e) {
       logError('trips/edit: сохранение поездки', e);
-      setSnackbar('Ошибка сохранения');
+      setSnackbar(t('common.errorSaving'));
     } finally {
       setSaving(false);
     }
@@ -64,7 +66,7 @@ export default function EditTripScreen() {
       <View style={styles.container}>
         <Appbar.Header>
           <Appbar.BackAction onPress={() => router.back()} />
-          <Appbar.Content title="Редактирование" />
+          <Appbar.Content title={t('trips.editShortTitle')} />
         </Appbar.Header>
         <View style={styles.center}>
           <ActivityIndicator size="large" />
@@ -77,19 +79,19 @@ export default function EditTripScreen() {
     <View style={styles.container}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title="Редактирование поездки" />
+        <Appbar.Content title={t('trips.editTitle')} />
       </Appbar.Header>
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         <TextInput
-          label="Название *"
+          label={t('trips.formNameLabel')}
           value={trip.title}
           onChangeText={(t) => setTrip((p) => (p ? { ...p, title: t } : p))}
           mode="outlined"
           style={styles.input}
         />
         <TextInput
-          label="Описание"
+          label={t('trips.formDescriptionLabel')}
           value={trip.description}
           onChangeText={(t) => setTrip((p) => (p ? { ...p, description: t } : p))}
           mode="outlined"
@@ -98,23 +100,23 @@ export default function EditTripScreen() {
           style={styles.input}
         />
         <TextInput
-          label="Дата начала"
+          label={t('trips.formStartDateLabel')}
           value={trip.startDate}
           onChangeText={(t) => setTrip((p) => (p ? { ...p, startDate: t } : p))}
           mode="outlined"
-          placeholder="YYYY-MM-DD"
+          placeholder={t('trips.formDatePlaceholder')}
           style={styles.input}
         />
         <TextInput
-          label="Дата окончания"
+          label={t('trips.formEndDateLabel')}
           value={trip.endDate}
           onChangeText={(t) => setTrip((p) => (p ? { ...p, endDate: t } : p))}
           mode="outlined"
-          placeholder="YYYY-MM-DD"
+          placeholder={t('trips.formDatePlaceholder')}
           style={styles.input}
         />
         <View style={styles.row}>
-          <Text variant="bodyLarge">Текущая поездка</Text>
+          <Text variant="bodyLarge">{t('trips.formCurrentTrip')}</Text>
           <Switch
             value={trip.current}
             onValueChange={(v) => setTrip((p) => (p ? { ...p, current: v } : p))}
@@ -127,7 +129,7 @@ export default function EditTripScreen() {
           disabled={saving}
           style={styles.save}
         >
-          Сохранить
+          {t('common.save')}
         </Button>
       </ScrollView>
 

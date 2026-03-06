@@ -16,10 +16,12 @@ import { getPlaceById, updatePlace } from '@/services';
 import { logError } from '@/utils/logger';
 import { savePhoto } from '@/services/photos';
 import type { Place } from '@/types';
+import { useTranslation } from 'react-i18next';
 
 export default function EditPlaceScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { t } = useTranslation();
   const [place, setPlace] = useState<Place | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -32,7 +34,7 @@ export default function EditPlaceScreen() {
       const p = await getPlaceById(id);
       setPlace(p);
     } catch (e) {
-      setSnackbar('Ошибка загрузки');
+      setSnackbar(t('common.errorLoading'));
     } finally {
       setLoading(false);
     }
@@ -67,7 +69,7 @@ export default function EditPlaceScreen() {
   const handleSave = async () => {
     if (!place || !id) return;
     if (!place.name.trim()) {
-      setSnackbar('Укажите название');
+      setSnackbar(t('places.errorNameRequired'));
       return;
     }
     setSaving(true);
@@ -76,7 +78,7 @@ export default function EditPlaceScreen() {
       router.back();
     } catch (e) {
       logError('places/edit: сохранение места', e);
-      setSnackbar('Ошибка сохранения');
+      setSnackbar(t('common.errorSaving'));
     } finally {
       setSaving(false);
     }
@@ -87,7 +89,7 @@ export default function EditPlaceScreen() {
       <View style={styles.container}>
         <Appbar.Header>
           <Appbar.BackAction onPress={() => router.back()} />
-          <Appbar.Content title="Редактирование" />
+          <Appbar.Content title={t('trips.editShortTitle')} />
         </Appbar.Header>
         <View style={styles.center}>
           <ActivityIndicator size="large" />
@@ -100,19 +102,19 @@ export default function EditPlaceScreen() {
     <View style={styles.container}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title="Редактирование места" />
+        <Appbar.Content title={t('places.editTitle')} />
       </Appbar.Header>
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         <TextInput
-          label="Название *"
+          label={t('places.formNameLabel')}
           value={place.name}
           onChangeText={(t) => setPlace((p) => (p ? { ...p, name: t } : p))}
           mode="outlined"
           style={styles.input}
         />
         <TextInput
-          label="Описание"
+          label={t('places.formDescriptionLabel')}
           value={place.description}
           onChangeText={(t) => setPlace((p) => (p ? { ...p, description: t } : p))}
           mode="outlined"
@@ -121,42 +123,42 @@ export default function EditPlaceScreen() {
           style={styles.input}
         />
         <TextInput
-          label="Путевые заметки"
+          label={t('places.formTravelNotesLabel')}
           value={place.travelNotes ?? ''}
           onChangeText={(t) => setPlace((p) => (p ? { ...p, travelNotes: t } : p))}
           mode="outlined"
           multiline
           numberOfLines={3}
-          placeholder="Заметки о месте..."
+          placeholder={t('places.formTravelNotesPlaceholder')}
           style={styles.input}
         />
         <TextInput
-          label="Координаты (широта, долгота)"
+          label={t('places.formCoordsLabel')}
           value={place.dd}
           onChangeText={(t) => setPlace((p) => (p ? { ...p, dd: t } : p))}
           mode="outlined"
-          placeholder="55.75, 37.62"
+          placeholder={t('places.formCoordsPlaceholder')}
           style={styles.input}
         />
         <View style={styles.row}>
-          <Text variant="bodyLarge">Посетить позже</Text>
+          <Text variant="bodyLarge">{t('places.formVisitLater')}</Text>
           <Switch
             value={place.visitlater}
             onValueChange={(v) => setPlace((p) => (p ? { ...p, visitlater: v } : p))}
           />
         </View>
         <View style={styles.row}>
-          <Text variant="bodyLarge">Понравилось</Text>
+          <Text variant="bodyLarge">{t('places.formLiked')}</Text>
           <Switch
             value={place.liked}
             onValueChange={(v) => setPlace((p) => (p ? { ...p, liked: v } : p))}
           />
         </View>
         <Text variant="titleSmall" style={styles.section}>
-          Фотографии
+          {t('places.formPhotosSection')}
         </Text>
         <TouchableOpacity style={styles.addPhoto} onPress={pickImage}>
-          <Text>+ Добавить фото</Text>
+          <Text>{t('places.formAddPhotoWithPlus')}</Text>
         </TouchableOpacity>
         {place.photos.length > 0 && (
           <View style={styles.photosRow}>
@@ -174,7 +176,7 @@ export default function EditPlaceScreen() {
           disabled={saving}
           style={styles.save}
         >
-          Сохранить
+          {t('common.save')}
         </Button>
       </ScrollView>
 

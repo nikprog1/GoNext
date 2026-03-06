@@ -6,6 +6,9 @@ import { useRouter } from 'expo-router';
 import { getErrors, clearErrors } from '@/utils/logger';
 import { useThemeContext } from '@/context/ThemeProvider';
 import { PrimaryColors } from '@/constants/theme';
+import { useTranslation } from 'react-i18next';
+import i18n from '@/i18n';
+import { saveLanguage, type SupportedLanguage } from '@/utils/i18n-storage';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -13,6 +16,10 @@ export default function SettingsScreen() {
   const [errorLogs, setErrorLogs] = useState<string[]>([]);
   const { mode, setMode, primaryColor, setPrimaryColor } = useThemeContext();
   const theme = useTheme();
+  const { t } = useTranslation();
+  const [language, setLanguage] = useState<SupportedLanguage>(
+    (i18n.language as SupportedLanguage) || 'ru'
+  );
 
   const showLogs = () => {
     setErrorLogs(getErrors());
@@ -33,26 +40,26 @@ export default function SettingsScreen() {
     <View style={styles.container}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title="Настройки" />
+        <Appbar.Content title={t('settings.title')} />
       </Appbar.Header>
       <View style={styles.content}>
-        <Text variant="bodyLarge">Настройки приложения GoNext</Text>
+        <Text variant="bodyLarge">{t('settings.title')} {t('app.name')}</Text>
         <Text variant="bodyMedium" style={styles.hint}>
-          Версия 1.0.0
+          {t('settings.version', { version: '1.0.0' })}
         </Text>
         <Text variant="titleMedium" style={styles.sectionTitle}>
-          Тема
+          {t('settings.themeSection')}
         </Text>
         <RadioButton.Group
           onValueChange={(value) => setMode(value as 'light' | 'dark')}
           value={mode}
         >
-          <RadioButton.Item label="Светлая тема" value="light" />
-          <RadioButton.Item label="Тёмная тема" value="dark" />
+          <RadioButton.Item label={t('settings.lightTheme', { defaultValue: 'Светлая тема' })} value="light" />
+          <RadioButton.Item label={t('settings.darkTheme', { defaultValue: 'Тёмная тема' })} value="dark" />
         </RadioButton.Group>
 
         <Text variant="titleMedium" style={styles.sectionTitle}>
-          Основной цвет
+          {t('settings.primaryColorSection')}
         </Text>
         <View style={styles.palette}>
           {PrimaryColors.map((c) => {
@@ -74,24 +81,40 @@ export default function SettingsScreen() {
           })}
         </View>
 
+        <Text variant="titleMedium" style={styles.sectionTitle}>
+          {t('settings.languageSection')}
+        </Text>
+        <RadioButton.Group
+          onValueChange={async (value) => {
+            const lang = value as SupportedLanguage;
+            setLanguage(lang);
+            await i18n.changeLanguage(lang);
+            await saveLanguage(lang);
+          }}
+          value={language}
+        >
+          <RadioButton.Item label={t('language.ru')} value="ru" />
+          <RadioButton.Item label={t('language.en')} value="en" />
+        </RadioButton.Group>
+
         <Button
           mode="outlined"
           style={styles.logsButton}
           onPress={showLogs}
           icon="bug"
         >
-          Логи ошибок
+          {t('settings.logsButton')}
         </Button>
       </View>
 
       <Portal>
         <Dialog visible={logsVisible} onDismiss={() => setLogsVisible(false)}>
-          <Dialog.Title>Логи ошибок</Dialog.Title>
+          <Dialog.Title>{t('settings.logsTitle')}</Dialog.Title>
           <Dialog.ScrollArea style={styles.dialogScroll}>
             <ScrollView style={styles.scrollContent}>
               {errorLogs.length === 0 ? (
                 <Text variant="bodyMedium" style={styles.emptyLogs}>
-                  Нет записей
+                  {t('settings.logsEmpty')}
                 </Text>
               ) : (
                 errorLogs.map((log, i) => (
@@ -103,9 +126,9 @@ export default function SettingsScreen() {
             </ScrollView>
           </Dialog.ScrollArea>
           <Dialog.Actions>
-            <Button onPress={refreshLogs}>Обновить</Button>
-            <Button onPress={handleClearLogs}>Очистить</Button>
-            <Button onPress={() => setLogsVisible(false)}>Закрыть</Button>
+            <Button onPress={refreshLogs}>{t('settings.logsRefresh')}</Button>
+            <Button onPress={handleClearLogs}>{t('settings.logsClear')}</Button>
+            <Button onPress={() => setLogsVisible(false)}>{t('settings.logsClose')}</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>

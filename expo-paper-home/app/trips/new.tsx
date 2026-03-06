@@ -12,6 +12,7 @@ import {
 import { useRouter } from 'expo-router';
 import { createTrip } from '@/services';
 import { logError } from '@/utils/logger';
+import { useTranslation } from 'react-i18next';
 
 const today = new Date().toISOString().slice(0, 10);
 const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
@@ -20,6 +21,7 @@ const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
 
 export default function NewTripScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState(today);
@@ -30,7 +32,7 @@ export default function NewTripScreen() {
 
   const handleSave = async () => {
     if (!title.trim()) {
-      setSnackbar('Укажите название поездки');
+      setSnackbar(t('trips.errorTitleRequired'));
       return;
     }
     setSaving(true);
@@ -55,19 +57,19 @@ export default function NewTripScreen() {
     <View style={styles.container}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title="Новая поездка" />
+        <Appbar.Content title={t('trips.newTitle')} />
       </Appbar.Header>
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         <TextInput
-          label="Название *"
+          label={t('trips.formNameLabel')}
           value={title}
           onChangeText={setTitle}
           mode="outlined"
           style={styles.input}
         />
         <TextInput
-          label="Описание"
+          label={t('trips.formDescriptionLabel')}
           value={description}
           onChangeText={setDescription}
           mode="outlined"
@@ -76,23 +78,23 @@ export default function NewTripScreen() {
           style={styles.input}
         />
         <TextInput
-          label="Дата начала"
+          label={t('trips.formStartDateLabel')}
           value={startDate}
           onChangeText={setStartDate}
           mode="outlined"
-          placeholder="YYYY-MM-DD"
+          placeholder={t('trips.formDatePlaceholder')}
           style={styles.input}
         />
         <TextInput
-          label="Дата окончания"
+          label={t('trips.formEndDateLabel')}
           value={endDate}
           onChangeText={setEndDate}
           mode="outlined"
-          placeholder="YYYY-MM-DD"
+          placeholder={t('trips.formDatePlaceholder')}
           style={styles.input}
         />
         <View style={styles.row}>
-          <Text variant="bodyLarge">Текущая поездка</Text>
+          <Text variant="bodyLarge">{t('trips.formCurrentTrip')}</Text>
           <Switch value={current} onValueChange={setCurrent} />
         </View>
         <Button
@@ -102,7 +104,7 @@ export default function NewTripScreen() {
           disabled={saving}
           style={styles.save}
         >
-          Создать
+          {t('trips.fabCreate')}
         </Button>
       </ScrollView>
 

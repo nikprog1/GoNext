@@ -30,12 +30,14 @@ import { openOnMap, openInNavigator } from '@/utils/map';
 import type { Trip, TripPlace, Place } from '@/types';
 import * as ImagePicker from 'expo-image-picker';
 import { savePhoto } from '@/services/photos';
+import { useTranslation } from 'react-i18next';
 
 type ViewMode = 'plan' | 'diary';
 
 export default function TripDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { t } = useTranslation();
   const [trip, setTrip] = useState<Trip | null>(null);
   const [placesMap, setPlacesMap] = useState<Record<string, Place>>({});
   const [loading, setLoading] = useState(true);
@@ -61,7 +63,7 @@ export default function TripDetailScreen() {
         setPlacesMap(map);
       }
     } catch (e) {
-      setSnackbar('Ошибка загрузки');
+      setSnackbar(t('common.errorLoading'));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -82,9 +84,9 @@ export default function TripDetailScreen() {
     try {
       await setCurrentTrip(id);
       setTrip((t) => (t ? { ...t, current: true } : null));
-      setSnackbar('Поездка выбрана как текущая');
+      setSnackbar(t('trips.detailSetCurrent'));
     } catch (e) {
-      setSnackbar('Ошибка');
+      setSnackbar(t('trips.errorGeneric'));
     }
   };
 
@@ -98,7 +100,7 @@ export default function TripDetailScreen() {
       });
       await load();
     } catch (e) {
-      setSnackbar('Ошибка');
+      setSnackbar(t('trips.errorGeneric'));
     }
   };
 
@@ -108,7 +110,7 @@ export default function TripDetailScreen() {
       setAllPlaces(all);
       setAddPlaceVisible(true);
     } catch (e) {
-      setSnackbar('Ошибка загрузки мест');
+      setSnackbar(t('trips.errorLoadPlaces'));
     }
   };
 
@@ -119,9 +121,9 @@ export default function TripDetailScreen() {
       await addPlaceToTrip(id, place);
       setAddPlaceVisible(false);
       await load();
-      setSnackbar('Место добавлено');
+      setSnackbar(t('trips.errorPlaceAdded'));
     } catch (e) {
-      setSnackbar('Ошибка добавления');
+      setSnackbar(t('trips.errorAddPlace'));
     } finally {
       setAddingPlaceId(null);
     }
@@ -132,9 +134,9 @@ export default function TripDetailScreen() {
     try {
       await removePlaceFromTrip(id, placeId);
       await load();
-      setSnackbar('Место удалено');
+      setSnackbar(t('trips.errorPlaceRemoved'));
     } catch (e) {
-      setSnackbar('Ошибка');
+      setSnackbar(t('trips.errorGeneric'));
     }
   };
 
@@ -153,19 +155,20 @@ export default function TripDetailScreen() {
       await reorderTripPlaces(id, ids);
       await load();
     } catch (e) {
-      setSnackbar('Ошибка изменения порядка');
+      setSnackbar(t('trips.errorReorder'));
     }
   };
 
   const formatDate = (d: string | null) =>
     d ? new Date(d).toLocaleDateString('ru-RU') : '';
+  // TODO: при необходимости можно локализовать формат даты отдельно
 
   if (!id || loading || !trip) {
     return (
       <View style={styles.container}>
         <Appbar.Header>
           <Appbar.BackAction onPress={() => router.back()} />
-          <Appbar.Content title="Поездка" />
+          <Appbar.Content title={t('trips.detailTitle')} />
         </Appbar.Header>
         <View style={styles.center}>
           <ActivityIndicator size="large" />
@@ -200,13 +203,15 @@ export default function TripDetailScreen() {
       >
         <Card style={styles.card}>
           <Card.Content>
-            <Text variant="bodyMedium">{trip.description || '—'}</Text>
+            <Text variant="bodyMedium">
+              {trip.description || t('trips.detailNoDescription')}
+            </Text>
             <Text variant="bodySmall" style={styles.dates}>
               {formatDate(trip.startDate)} — {formatDate(trip.endDate)}
             </Text>
             {!trip.current && (
               <Button mode="outlined" onPress={handleSetCurrent} style={styles.setCurrent}>
-                Сделать текущей
+                {t('trips.detailSetCurrent')}
               </Button>
             )}
           </Card.Content>
@@ -217,22 +222,22 @@ export default function TripDetailScreen() {
             value={viewMode}
             onValueChange={(v) => setViewMode(v as ViewMode)}
             buttons={[
-              { value: 'plan', label: 'План' },
-              { value: 'diary', label: 'Дневник' },
+              { value: 'plan', label: t('trips.detailPlan') },
+              { value: 'diary', label: t('trips.detailDiary') },
             ]}
           />
         </View>
 
         <View style={styles.headerRow}>
-          <Text variant="titleMedium">Маршрут</Text>
+          <Text variant="titleMedium">{t('trips.detailRouteHeader')}</Text>
           <Button mode="text" onPress={openAddPlace} icon="plus">
-            Добавить место
+            {t('trips.detailAddPlace')}
           </Button>
         </View>
 
         {trip.places.length === 0 ? (
           <Text variant="bodyMedium" style={styles.empty}>
-            Нет мест в маршруте. Добавьте места из базы.
+            {t('trips.detailEmptyRoute')}
           </Text>
         ) : (
           placesToShow.map((tp) => {
@@ -260,11 +265,11 @@ export default function TripDetailScreen() {
 
       <Portal>
         <Dialog visible={addPlaceVisible} onDismiss={() => setAddPlaceVisible(false)}>
-          <Dialog.Title>Добавить место</Dialog.Title>
+          <Dialog.Title>{t('trips.dialogAddPlaceTitle')}</Dialog.Title>
           <Dialog.ScrollArea style={styles.dialogScroll}>
             {availablePlaces.length === 0 ? (
               <Text variant="bodyMedium" style={styles.emptyPlaces}>
-                Все места уже добавлены или нет мест в базе
+                {t('trips.dialogAddPlaceEmpty')}
               </Text>
             ) : (
               availablePlaces.map((item) => (
@@ -284,7 +289,9 @@ export default function TripDetailScreen() {
             )}
           </Dialog.ScrollArea>
           <Dialog.Actions>
-            <Button onPress={() => setAddPlaceVisible(false)}>Закрыть</Button>
+            <Button onPress={() => setAddPlaceVisible(false)}>
+              {t('trips.dialogAddPlaceClose')}
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -321,6 +328,7 @@ function PlaceInTripRow({
   onMoveDown: () => void;
   onNotesSaved: () => void;
 }) {
+  const { t } = useTranslation();
   const [notesVisible, setNotesVisible] = useState(false);
   const [notes, setNotes] = useState(tripPlace.notes);
   const [savingNotes, setSavingNotes] = useState(false);
@@ -387,7 +395,11 @@ function PlaceInTripRow({
             <View style={styles.placeInfo}>
               <Text variant="titleMedium">{place.name}</Text>
               {viewMode === 'diary' && tripPlace.visitDate && (
-                <Text variant="bodySmall">Посещено: {formatDate(tripPlace.visitDate)}</Text>
+                <Text variant="bodySmall">
+                  {t('trips.placeVisitedLabel', {
+                    date: formatDate(tripPlace.visitDate),
+                  })}
+                </Text>
               )}
               {tripPlace.notes ? (
                 <Text variant="bodySmall" style={styles.notes}>
@@ -399,16 +411,16 @@ function PlaceInTripRow({
         </Card.Content>
         <View style={styles.cardActions}>
           <Button onPress={onMoveUp} icon="chevron-up" compact style={styles.actionBtn}>
-            Вверх
+            {t('trips.placeMoveUp')}
           </Button>
           <Button onPress={onMoveDown} icon="chevron-down" compact style={styles.actionBtn}>
-            Вниз
+            {t('trips.placeMoveDown')}
           </Button>
           <Button onPress={onMap} icon="map" compact style={styles.actionBtn}>
-            Карта
+            {t('trips.placeMap')}
           </Button>
           <Button onPress={onNav} icon="navigation" compact style={styles.actionBtn}>
-            Маршрут
+            {t('trips.placeRoute')}
           </Button>
           <Button
             onPress={() => setNotesVisible(true)}
@@ -416,7 +428,7 @@ function PlaceInTripRow({
             compact
             style={styles.actionBtn}
           >
-            Заметки
+            {t('trips.placeNotes')}
           </Button>
           <Button
             onPress={() => setPhotosVisible(true)}
@@ -424,7 +436,7 @@ function PlaceInTripRow({
             compact
             style={styles.actionBtn}
           >
-            Фото
+            {t('trips.placePhotos')}
           </Button>
           <Button
             onPress={onRemove}
@@ -433,14 +445,16 @@ function PlaceInTripRow({
             textColor="#c62828"
             style={styles.actionBtn}
           >
-            Удалить
+            {t('trips.placeDelete')}
           </Button>
         </View>
       </Card>
 
       <Portal>
         <Dialog visible={notesVisible} onDismiss={() => setNotesVisible(false)}>
-          <Dialog.Title>Заметки: {place.name}</Dialog.Title>
+          <Dialog.Title>
+            {t('trips.notesDialogTitle', { name: place.name })}
+          </Dialog.Title>
           <Dialog.Content>
             <TextInput
               value={notes}
@@ -448,25 +462,27 @@ function PlaceInTripRow({
               mode="outlined"
               multiline
               numberOfLines={4}
-              placeholder="Заметки о посещении..."
+              placeholder={t('trips.notesPlaceholder')}
             />
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setNotesVisible(false)}>Отмена</Button>
+            <Button onPress={() => setNotesVisible(false)}>{t('common.cancel')}</Button>
             <Button onPress={handleSaveNotes} loading={savingNotes} disabled={savingNotes}>
-              Сохранить
+              {t('common.save')}
             </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
       <Portal>
         <Dialog visible={photosVisible} onDismiss={() => setPhotosVisible(false)}>
-          <Dialog.Title>Фото: {place.name}</Dialog.Title>
+          <Dialog.Title>
+            {t('trips.photosDialogTitle', { name: place.name })}
+          </Dialog.Title>
           <Dialog.ScrollArea style={styles.dialogScroll}>
             <ScrollView horizontal contentContainerStyle={styles.photosRow}>
               {photos.length === 0 ? (
                 <Text variant="bodyMedium" style={styles.empty}>
-                  Нет фотографий
+                  {t('trips.photosEmpty')}
                 </Text>
               ) : (
                 photos.map((uri, index) => (
@@ -477,9 +493,11 @@ function PlaceInTripRow({
           </Dialog.ScrollArea>
           <Dialog.Actions>
             <Button onPress={handleAddPhoto} loading={savingPhoto} disabled={savingPhoto}>
-              Добавить фото
+              {t('trips.photosAdd')}
             </Button>
-            <Button onPress={() => setPhotosVisible(false)}>Закрыть</Button>
+            <Button onPress={() => setPhotosVisible(false)}>
+              {t('trips.photosClose')}
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>

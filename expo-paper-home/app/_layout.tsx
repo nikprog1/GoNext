@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import 'react-native-reanimated';
 import { PaperProvider } from 'react-native-paper';
 import { ImageBackground, StyleSheet, View } from 'react-native';
+import '@/i18n';
 import { ThemeProvider, useThemeContext } from '@/context/ThemeProvider';
 import { Colors } from '@/constants/theme';
 
